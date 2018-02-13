@@ -9,19 +9,20 @@ package nl.tue.s2id90.group88;
  *
  * @author Michiel
  */
-public class Piece {
-    public enum colors{
-        BLACK, WHITE;
-    };
+class Piece {
+
 
     boolean superState;
-    public int x, y;
-    public colors c;
+    color c;
+    int position;
 
-    Piece(int inX, int inY, colors Color){
-        x = inX;
-        y = inY;
+    Piece(int index, color Color){
+        position = index;
         superState = false;
         c = Color;
     }
 }
+
+enum color{
+    BLACK, WHITE;
+};
