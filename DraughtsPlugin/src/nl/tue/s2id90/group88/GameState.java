@@ -24,9 +24,18 @@ class GameState {
             whites.set(i-26, new Piece(i, color.WHITE));
         }
     }
-    public Move getMoves(){
+    Move getMoves(){
         Move move = new Move();
         
         return move;
+    }
+    
+    void doMove(Move move){
+        move.piece.position = move.finalPosition;
+        
+    }
+    
+    void undoMove(Move move){
+        move.piece.position = move.initialPosition;
     }
 }

@@ -12,13 +12,13 @@ package nl.tue.s2id90.group88;
 class Piece {
 
 
-    boolean superState;
+    boolean crowned;
     color c;
     int position;
 
     Piece(int index, color Color){
         position = index;
-        superState = false;
+        crowned = false;
         c = Color;
     }
 }

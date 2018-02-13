@@ -10,5 +10,12 @@ package nl.tue.s2id90.group88;
  * @author Michiel
  */
 public class Move {
-    
+    Piece piece;
+    int initialPosition, finalPosition;
+    Move(int newPosition, Piece movedPiece){
+        piece = movedPiece;
+        initialPosition = movedPiece.position;
+        finalPosition = newPosition;
+    }
+    //Add Multiple Moves and Remove Opponent
 }
