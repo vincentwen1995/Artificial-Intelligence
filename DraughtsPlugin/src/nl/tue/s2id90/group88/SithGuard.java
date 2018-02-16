@@ -12,7 +12,7 @@ import org10x10.dam.game.Move;
  * Implementation of the DraughtsPlayer interface.
  * @author huub
  */
-// ToDo: rename this class (and hence this file) to have a distinct name
+// (DONE)ToDo: rename this class (and hence this file) to have a distinct name
 //       for your player during the tournament
 public class SithGuard  extends DraughtsPlayer{
     private int bestValue=0;
@@ -115,25 +115,82 @@ public class SithGuard  extends DraughtsPlayer{
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
         DraughtsState state = node.getState();
-        // ToDo: write an alphabeta search to compute bestMove and value
-        Move bestMove = state.getMoves().get(0);
-        int value = 0;
+        // ToDo: write an alphabeta search to compute bestMove and value        
+        int bestValue = MAX_VALUE, i = 0;
+        int bestMoveIndex = 0;
+        List<Move> moves = state.getMoves();        
+        boolean isLeaf = moves.isEmpty();
+        for (Move move : moves){           
+            state.doMove(move);            
+            int value = alphaBetaMax(node, alpha, beta, depth);
+            beta = Math.min(beta, value);            
+            state.undoMove(move);
+            if (beta <= alpha) {
+                Move bestMove = moves.get(bestMoveIndex);
+                node.setBestMove(bestMove);
+                return alpha;
+            }
+            if (bestValue > value) {
+                bestValue = value;
+                bestMoveIndex = i;
+            }    
+            i++;
+        }                
+        if (isLeaf) {
+            return evaluate(node.getState());
+        }
+        Move bestMove = moves.get(bestMoveIndex);
         node.setBestMove(bestMove);
-        return value;
+        return bestValue;
      }
     
     int alphaBetaMax(DraughtsNode node, int alpha, int beta, int depth)
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
         DraughtsState state = node.getState();
-        // ToDo: write an alphabeta search to compute bestMove and value
-        Move bestMove = state.getMoves().get(0);
-        int value = 0;
+        // (DONE)ToDo: write an alphabeta search to compute bestMove and value
+        // ToDo: Implement Iterative Deepening
+        int bestValue = MIN_VALUE, i = 0;
+        int bestMoveIndex = 0;
+        List<Move> moves = state.getMoves();
+        boolean isLeaf = moves.isEmpty();
+        for (Move move : moves){
+            state.doMove(move);            
+            int value = alphaBetaMin(node, alpha, beta, depth);
+            alpha = Math.max(alpha, value);            
+            state.undoMove(move);
+            if (alpha >= beta) {
+                Move bestMove = moves.get(bestMoveIndex);
+                node.setBestMove(bestMove);
+                return beta;
+            }
+            if (bestValue < value){
+                bestValue = value;
+                bestMoveIndex = i;
+            }
+            i++;
+        }
+        if (isLeaf) {
+            return evaluate(node.getState());
+        }
+        Move bestMove = moves.get(bestMoveIndex);
         node.setBestMove(bestMove);
-        return value;
+        return bestValue;
     }
 
     /** A method that evaluates the given state. */
-    // ToDo: write an appropriate evaluation function
-    int evaluate(DraughtsState state) { return 0; }
+    // (DONE)ToDo: write an appropriate evaluation function
+    int evaluate(DraughtsState state) { 
+        int[] pieces = state.getPieces();
+        int whiteCount = 0, blackCount = 0;
+        for (int i = 1; i < 51; i++) {
+            if (pieces[i] == 1 || pieces[i] == 3){          //WHITEPIECE = 1, WHITEKING = 3
+                whiteCount++;
+            }
+            else if(pieces[i] == 2 || pieces[i] ==4) {      //BLACKPIECE = 2, BLACKKING = 4
+                blackCount++;
+            }
+        }        
+        return whiteCount - blackCount; 
+    }
 }
