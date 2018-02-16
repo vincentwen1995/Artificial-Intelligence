@@ -22,7 +22,7 @@ public class SithGuard  extends DraughtsPlayer{
     private boolean stopped;
 
     public SithGuard(int maxSearchDepth) {
-        super("best.png"); // ToDo: replace with your own icon
+        super("Emperor's_Shadow_Guard.jpeg"); // ToDo: replace with your own icon
         this.maxSearchDepth = maxSearchDepth;
     }
     
