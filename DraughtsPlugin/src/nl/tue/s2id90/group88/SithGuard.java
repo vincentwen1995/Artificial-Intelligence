@@ -23,7 +23,7 @@ public class SithGuard  extends DraughtsPlayer{
 
     public SithGuard(int maxSearchDepth) {
         super("Emperor's_Shadow_Guard.jpeg"); // ToDo: replace with your own icon
-        this.maxSearchDepth = 3;
+        this.maxSearchDepth = maxSearchDepth;
     }
     
     @Override public Move getMove(DraughtsState s) {
@@ -32,7 +32,8 @@ public class SithGuard  extends DraughtsPlayer{
         DraughtsNode node = new DraughtsNode(s);    // the root of the search tree
         try {
                 // compute bestMove and bestValue in a call to alphabeta
-                bestValue = alphaBeta(node, MIN_VALUE, MAX_VALUE, maxSearchDepth, 0);
+                
+                bestValue = alphaBeta(node, MIN_VALUE, MAX_VALUE, 3, 0);
             
                 // store the bestMove found uptill now
                 // NB this is not done in case of an AIStoppedException in alphaBeat()
@@ -113,9 +114,11 @@ public class SithGuard  extends DraughtsPlayer{
      int alphaBetaMin(DraughtsNode node, int alpha, int beta, int depth, int curDepth)
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
+        System.out.println("Current Depth: " + Integer.toString(curDepth) + " alpha: " + Integer.toString(alpha) + " beta: " + Integer.toString(beta) );
         DraughtsState state = node.getState();
-        if(curDepth == depth){
-            return evaluate(node.getState());
+        if(curDepth >= depth){
+            System.out.println("Depth limit reached");
+            return evaluate(node.getState());          
         }
         // ToDo: write an alphabeta search to compute bestMove and value        
         int bestValue = MAX_VALUE, i = 0;
@@ -149,8 +152,10 @@ public class SithGuard  extends DraughtsPlayer{
     int alphaBetaMax(DraughtsNode node, int alpha, int beta, int depth, int curDepth)
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
+        System.out.println("Current Depth: " + Integer.toString(curDepth) + " alpha: " + Integer.toString(alpha) + " beta: " + Integer.toString(beta) );
         DraughtsState state = node.getState();
-        if(curDepth == depth){
+        if(curDepth >= depth){
+            System.out.println("Depth limit reached");
             return evaluate(node.getState());
         }
 
