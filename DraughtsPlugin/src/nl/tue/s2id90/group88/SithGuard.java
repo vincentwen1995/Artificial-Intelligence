@@ -23,7 +23,7 @@ public class SithGuard  extends DraughtsPlayer{
 
     public SithGuard(int maxSearchDepth) {
         super("Emperor's_Shadow_Guard.jpeg"); // ToDo: replace with your own icon
-        this.maxSearchDepth = maxSearchDepth;
+        this.maxSearchDepth = 3;
     }
     
     @Override public Move getMove(DraughtsState s) {
@@ -31,13 +31,12 @@ public class SithGuard  extends DraughtsPlayer{
         bestValue = 0;
         DraughtsNode node = new DraughtsNode(s);    // the root of the search tree
         try {
-            // compute bestMove and bestValue in a call to alphabeta
-            bestValue = alphaBeta(node, MIN_VALUE, MAX_VALUE, maxSearchDepth);
+                // compute bestMove and bestValue in a call to alphabeta
+                bestValue = alphaBeta(node, MIN_VALUE, MAX_VALUE, maxSearchDepth, 0);
             
-            // store the bestMove found uptill now
-            // NB this is not done in case of an AIStoppedException in alphaBeat()
-            bestMove  = node.getBestMove();
-            
+                // store the bestMove found uptill now
+                // NB this is not done in case of an AIStoppedException in alphaBeat()
+                bestMove  = node.getBestMove();
             // print the results for debugging reasons
             System.err.format(
                 "%s: depth= %2d, best move = %5s, value=%d\n", 
@@ -84,13 +83,13 @@ public class SithGuard  extends DraughtsPlayer{
      * @return the computed value of this node
      * @throws AIStoppedException
      **/
-    int alphaBeta(DraughtsNode node, int alpha, int beta, int depth)
+    int alphaBeta(DraughtsNode node, int alpha, int beta, int depth, int curDepth)
             throws AIStoppedException
     {
         if (node.getState().isWhiteToMove()) {
-            return alphaBetaMax(node, alpha, beta, depth);
+            return alphaBetaMax(node, alpha, beta, depth, curDepth);
         } else  {
-            return alphaBetaMin(node, alpha, beta, depth);
+            return alphaBetaMin(node, alpha, beta, depth, curDepth);
         }
     }
     
@@ -111,10 +110,13 @@ public class SithGuard  extends DraughtsPlayer{
      * @return the compute value of this node
      * @throws AIStoppedException thrown whenever the boolean stopped has been set to true.
      */
-     int alphaBetaMin(DraughtsNode node, int alpha, int beta, int depth)
+     int alphaBetaMin(DraughtsNode node, int alpha, int beta, int depth, int curDepth)
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
         DraughtsState state = node.getState();
+        if(curDepth == depth){
+            return evaluate(node.getState());
+        }
         // ToDo: write an alphabeta search to compute bestMove and value        
         int bestValue = MAX_VALUE, i = 0;
         int bestMoveIndex = 0;
@@ -122,7 +124,7 @@ public class SithGuard  extends DraughtsPlayer{
         boolean isLeaf = moves.isEmpty();
         for (Move move : moves){           
             state.doMove(move);            
-            int value = alphaBetaMax(node, alpha, beta, depth);
+            int value = alphaBetaMax(node, alpha, beta, depth, curDepth++);
             beta = Math.min(beta, value);            
             state.undoMove(move);
             if (beta <= alpha) {
@@ -144,10 +146,14 @@ public class SithGuard  extends DraughtsPlayer{
         return bestValue;
      }
     
-    int alphaBetaMax(DraughtsNode node, int alpha, int beta, int depth)
+    int alphaBetaMax(DraughtsNode node, int alpha, int beta, int depth, int curDepth)
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
         DraughtsState state = node.getState();
+        if(curDepth == depth){
+            return evaluate(node.getState());
+        }
+
         // (DONE)ToDo: write an alphabeta search to compute bestMove and value
         // ToDo: Implement Iterative Deepening
         int bestValue = MIN_VALUE, i = 0;
@@ -156,7 +162,7 @@ public class SithGuard  extends DraughtsPlayer{
         boolean isLeaf = moves.isEmpty();
         for (Move move : moves){
             state.doMove(move);            
-            int value = alphaBetaMin(node, alpha, beta, depth);
+            int value = alphaBetaMin(node, alpha, beta, depth, curDepth++);
             alpha = Math.max(alpha, value);            
             state.undoMove(move);
             if (alpha >= beta) {
