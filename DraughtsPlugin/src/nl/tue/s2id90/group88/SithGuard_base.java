@@ -14,7 +14,7 @@ import org10x10.dam.game.Move;
  */
 // (DONE)ToDo: rename this class (and hence this file) to have a distinct name
 //       for your player during the tournament
-public class SithGuard  extends DraughtsPlayer{
+public class SithGuard_base  extends DraughtsPlayer{
     private int bestValue=0;
     int maxSearchDepth;
     
@@ -22,7 +22,7 @@ public class SithGuard  extends DraughtsPlayer{
     private boolean stopped;
 //    protected boolean playerColor;
 
-    public SithGuard(int maxSearchDepth) {
+    public SithGuard_base(int maxSearchDepth) {
         super("Emperor's_Shadow_Guard.jpeg"); // ToDo: replace with your own icon
         this.maxSearchDepth = maxSearchDepth;
     }
