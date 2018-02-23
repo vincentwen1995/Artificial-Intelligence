@@ -195,18 +195,20 @@ public class Clone  extends DraughtsPlayer{
     }
 
     /** A method that evaluates the given state. */
-    // (DONE)ToDo: write an appropriate evaluation function
     int evaluate(DraughtsState state) { 
         int[] pieces = state.getPieces();
         int material, whiteCount = 0, blackCount = 0;
         int tempi, whiteTempi = 0, blackTempi = 0;
         int centring, whiteCentr = 0, blackCentr = 0;
-        int matWeight = 3, tempWeight = 1, centrWeight = 1;
+        int formation, whiteForm = 0, blackForm = 0;
+        int balance, whiteBalance = 0, blackBalance = 0;
+        int matWeight = 6, tempWeight = 2, centrWeight = 1, formWeight = 1, balanceWeight = 1;
         for (int i = 1; i < 51; i++){
             if (pieces[i] == DraughtsState.WHITEPIECE){
                 whiteCount++;
                 whiteTempi += -(Math.ceil(i / 5) - 10);
                 whiteCentr += -(Math.abs(i % 5 - 3) - 2);
+                whiteBalance += Math.abs(i % 5 - 3);
             } else if(pieces[i] == DraughtsState.WHITEKING){          //WHITEPIECE = 1, WHITEKING = 3
                 whiteCount += 3;
                 whiteTempi += 10;
@@ -215,17 +217,21 @@ public class Clone  extends DraughtsPlayer{
                 blackCount++;
                 blackTempi += Math.ceil(i / 5);
                 blackCentr += -(Math.abs(i % 5 - 3) - 2);
+                blackBalance += Math.abs(i % 5 - 3);
             } else if(pieces[i] == DraughtsState.BLACKKING) {      //BLACKPIECE = 2, BLACKKING = 4
                 blackCount += 3;
                 blackTempi += 10;
                 blackCentr += -(Math.abs(i % 5 - 3) - 2);
             }
+            
         }        
         material = whiteCount - blackCount;
         tempi = whiteTempi - blackTempi;
+        centring = whiteCentr - blackCentr;
+        formation = whiteForm - blackForm;
+        balance = whiteBalance - blackBalance;
         
-        
-        int evaluation = matWeight * material + tempWeight * tempi;
+        int evaluation = matWeight * material + tempWeight * tempi + centrWeight * centring + formWeight * formation + balanceWeight * balance;
         return evaluation; 
     }
 }
