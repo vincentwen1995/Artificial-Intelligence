@@ -198,22 +198,27 @@ public class Clone  extends DraughtsPlayer{
     // (DONE)ToDo: write an appropriate evaluation function
     int evaluate(DraughtsState state) { 
         int[] pieces = state.getPieces();
-        int whiteCount = 0, blackCount = 0;
-        int material, tempi, whiteTempi = 0, blackTempi = 0;
-        int matWeight = 3, tempWeight = 1;
+        int material, whiteCount = 0, blackCount = 0;
+        int tempi, whiteTempi = 0, blackTempi = 0;
+        int centring, whiteCentr = 0, blackCentr = 0;
+        int matWeight = 3, tempWeight = 1, centrWeight = 1;
         for (int i = 1; i < 51; i++){
             if (pieces[i] == DraughtsState.WHITEPIECE){
                 whiteCount++;
                 whiteTempi += -(Math.ceil(i / 5) - 10);
+                whiteCentr += -(Math.abs(i % 5 - 3) - 2);
             } else if(pieces[i] == DraughtsState.WHITEKING){          //WHITEPIECE = 1, WHITEKING = 3
                 whiteCount += 3;
                 whiteTempi += 10;
+                whiteCentr += -(Math.abs(i % 5 - 3) - 2);
             } else if(pieces[i] == DraughtsState.BLACKPIECE) {
                 blackCount++;
                 blackTempi += Math.ceil(i / 5);
+                blackCentr += -(Math.abs(i % 5 - 3) - 2);
             } else if(pieces[i] == DraughtsState.BLACKKING) {      //BLACKPIECE = 2, BLACKKING = 4
                 blackCount += 3;
-                whiteTempi += 10;
+                blackTempi += 10;
+                blackCentr += -(Math.abs(i % 5 - 3) - 2);
             }
         }        
         material = whiteCount - blackCount;
