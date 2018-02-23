@@ -199,18 +199,29 @@ public class Clone  extends DraughtsPlayer{
     int evaluate(DraughtsState state) { 
         int[] pieces = state.getPieces();
         int whiteCount = 0, blackCount = 0;
-        for (int i = 1; i < 51; i++) {
+        int material, tempi, whiteTempi = 0, blackTempi = 0;
+        int matWeight = 3, tempWeight = 1;
+        for (int i = 1; i < 51; i++){
             if (pieces[i] == DraughtsState.WHITEPIECE){
                 whiteCount++;
+                whiteTempi += -(Math.ceil(i / 5) - 10);
             } else if(pieces[i] == DraughtsState.WHITEKING){          //WHITEPIECE = 1, WHITEKING = 3
                 whiteCount += 3;
+                whiteTempi += 10;
             } else if(pieces[i] == DraughtsState.BLACKPIECE) {
-                whiteCount++;
+                blackCount++;
+                blackTempi += Math.ceil(i / 5);
             } else if(pieces[i] == DraughtsState.BLACKKING) {      //BLACKPIECE = 2, BLACKKING = 4
                 blackCount += 3;
+                whiteTempi += 10;
             }
         }        
-        return whiteCount - blackCount; 
+        material = whiteCount - blackCount;
+        tempi = whiteTempi - blackTempi;
+        
+        
+        int evaluation = matWeight * material + tempWeight * tempi;
+        return evaluation; 
     }
 }
 
