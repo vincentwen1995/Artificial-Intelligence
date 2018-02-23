@@ -23,7 +23,8 @@ public class MyDraughtsPlugin extends DraughtsPlayerProvider implements Draughts
         super(new SithGuard_base(5),
                 new UninformedPlayer(),
                 new OptimisticPlayer(),
-                new BuggyPlayer()
+                new BuggyPlayer(),
+                new Clone(5)
         );
     }
 }
