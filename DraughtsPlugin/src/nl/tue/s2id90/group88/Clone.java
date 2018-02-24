@@ -117,15 +117,12 @@ public class Clone  extends DraughtsPlayer{
      * @throws AIStoppedException thrown whenever the boolean stopped has been set to true.
      */
      int alphaBetaMin(DraughtsNode node, int alpha, int beta, int depth, int curDepth)
-            throws AIStoppedException {        
+            throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
- //       System.out.println("Current Depth = " + Integer.toString(curDepth) + " alpha = " + Integer.toString(alpha) + " beta = " + Integer.toString(beta) );
         DraughtsState state = node.getState();
         if(curDepth >= depth){
-//            System.out.println("Depth limit reached");
             return evaluate(node.getState());          
         }
-        // ToDo: write an alphabeta search to compute bestMove and value        
         int bestVal = MAX_VALUE, i = 0;
         int bestMoveIndex = 0;
         int nextDepth;
@@ -157,15 +154,10 @@ public class Clone  extends DraughtsPlayer{
     int alphaBetaMax(DraughtsNode node, int alpha, int beta, int depth, int curDepth)
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
-//        System.out.println("Current Depth = " + Integer.toString(curDepth) + " alpha = " + Integer.toString(alpha) + " beta = " + Integer.toString(beta) );
         DraughtsState state = node.getState();
         if(curDepth >= depth){
-//            System.out.println("Depth limit reached");
             return evaluate(node.getState());
         }
-
-        // (DONE)ToDo: write an alphabeta search to compute bestMove and value
-        // ToDo: Implement Iterative Deepening
         int bestVal = MIN_VALUE, i = 0;
         int bestMoveIndex = 0;
         int nextDepth;
@@ -208,7 +200,7 @@ public class Clone  extends DraughtsPlayer{
                 whiteCount++;
                 whiteTempi += -(Math.ceil(i / 5) - 10);
                 whiteCentr += -(Math.abs(i % 5 - 3) - 2);
-                whiteBalance += Math.abs(i % 5 - 3);
+                whiteBalance += Integer.signum(Math.abs(i % 5 - 3));
             } else if(pieces[i] == DraughtsState.WHITEKING){          //WHITEPIECE = 1, WHITEKING = 3
                 whiteCount += 3;
                 whiteTempi += 10;
@@ -217,7 +209,7 @@ public class Clone  extends DraughtsPlayer{
                 blackCount++;
                 blackTempi += Math.ceil(i / 5);
                 blackCentr += -(Math.abs(i % 5 - 3) - 2);
-                blackBalance += Math.abs(i % 5 - 3);
+                blackBalance += Integer.signum(Math.abs(i % 5 - 3));
             } else if(pieces[i] == DraughtsState.BLACKKING) {      //BLACKPIECE = 2, BLACKKING = 4
                 blackCount += 3;
                 blackTempi += 10;
