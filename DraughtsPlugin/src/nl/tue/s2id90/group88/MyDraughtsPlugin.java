@@ -24,7 +24,8 @@ public class MyDraughtsPlugin extends DraughtsPlayerProvider implements Draughts
                 new UninformedPlayer(),
                 new OptimisticPlayer(),
                 new BuggyPlayer(),
-                new Clone(0)
+                new Clone(0),
+                new BadAss()
         );
     }
 }
