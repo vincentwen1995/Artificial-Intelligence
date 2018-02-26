@@ -17,7 +17,10 @@ import org10x10.dam.game.Move;
 public class Clone  extends DraughtsPlayer{
     private int bestValue=0;
     int maxSearchDepth;
-    
+    public int whitePcs = 20;
+    public int blackPcs = 20;
+    public int lastwhitePcs = 20;
+    public int lastblackPcs = 20;
     /** boolean that indicates that the GUI asked the player to stop thinking. */
     private boolean stopped;
 //    protected boolean playerColor;
@@ -120,18 +123,23 @@ public class Clone  extends DraughtsPlayer{
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
         DraughtsState state = node.getState();
-        if(curDepth >= depth){
-            return evaluate(node.getState());          
+        countPcs(state);
+        System.out.println("WhitePcs: " + whitePcs + " BlackPcs: " + blackPcs +" lastWhitePcs: " + lastwhitePcs + " lastBlackPcs: " + lastblackPcs);
+        if(curDepth >= depth && isQuite()){
+            return evaluate(state);          
         }
         int bestVal = MAX_VALUE, i = 0;
         int bestMoveIndex = 0;
-        int nextDepth;
-        List<Move> moves = state.getMoves();        
-        boolean isLeaf = moves.isEmpty();
+        List<Move> moves = state.getMoves();
+//        boolean isLeaf = moves.isEmpty();
+        if (moves.isEmpty()) {
+            return evaluate(state);
+        }
+        lastwhitePcs = whitePcs;
+        lastblackPcs = blackPcs;
         for (Move move : moves){           
             state.doMove(move);
-            nextDepth = curDepth + 1;
-            int value = alphaBetaMax(node, alpha, beta, depth, nextDepth);
+            int value = alphaBetaMax(node, alpha, beta, depth, curDepth + 1);
             beta = Math.min(beta, value);            
             state.undoMove(move);
             if (beta <= alpha) {
@@ -144,9 +152,6 @@ public class Clone  extends DraughtsPlayer{
             }    
             i++;
         }                
-        if (isLeaf) {
-            return evaluate(node.getState());
-        }
         node.setBestMove(moves.get(bestMoveIndex));
         return bestVal;
      }
@@ -155,18 +160,23 @@ public class Clone  extends DraughtsPlayer{
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
         DraughtsState state = node.getState();
-        if(curDepth >= depth){
-            return evaluate(node.getState());
+        countPcs(state);
+        System.out.println("WhitePcs: " + whitePcs + " BlackPcs: " + blackPcs +" lastWhitePcs: " + lastwhitePcs + " lastBlackPcs: " + lastblackPcs);
+        if(curDepth >= depth && isQuite()){
+            return evaluate(state);
         }
         int bestVal = MIN_VALUE, i = 0;
         int bestMoveIndex = 0;
-        int nextDepth;
         List<Move> moves = state.getMoves();
-        boolean isLeaf = moves.isEmpty();
+//        boolean isLeaf = moves.isEmpty();
+        if (moves.isEmpty()) {
+            return evaluate(state);
+        }
+        lastwhitePcs = whitePcs;
+        lastblackPcs = blackPcs;
         for (Move move : moves){
             state.doMove(move);            
-            nextDepth = curDepth + 1;
-            int value = alphaBetaMin(node, alpha, beta, depth, nextDepth);
+            int value = alphaBetaMin(node, alpha, beta, depth, curDepth + 1);
             alpha = Math.max(alpha, value);            
             state.undoMove(move);
             if (alpha >= beta) {
@@ -179,13 +189,31 @@ public class Clone  extends DraughtsPlayer{
             }
             i++;
         }
-        if (isLeaf) {
-            return evaluate(node.getState());
-        }
         node.setBestMove(moves.get(bestMoveIndex));
         return bestVal;
     }
-
+    
+    void countPcs (DraughtsState state){
+        int[] pieces = state.getPieces();
+        whitePcs = 0;
+        blackPcs = 0;
+        for (int i = 1; i < 51; i++){
+            if (pieces[i] == DraughtsState.WHITEPIECE || pieces[i] == DraughtsState.WHITEKING){
+                whitePcs++;
+            } else if(pieces[i] == DraughtsState.BLACKPIECE || pieces[i] == DraughtsState.BLACKKING) {
+                blackPcs++;
+            }
+        }
+    }
+    
+    boolean isQuite () {        
+        if (whitePcs == lastwhitePcs || blackPcs == lastblackPcs){//Not the perfect condition for checking quiescence        
+            return true;
+        }
+        else {
+            return false;
+        }        
+    }
     /** A method that evaluates the given state. */
     int evaluate(DraughtsState state) { 
         int[] pieces = state.getPieces();
