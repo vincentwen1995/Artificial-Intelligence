@@ -4,6 +4,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
 import java.util.Collections;
 import java.util.List;
+//import java.util.ArrayList;
 import nl.tue.s2id90.draughts.DraughtsState;
 import nl.tue.s2id90.draughts.player.DraughtsPlayer;
 import org10x10.dam.game.Move;
@@ -14,19 +15,23 @@ import org10x10.dam.game.Move;
  */
 // (DONE)ToDo: rename this class (and hence this file) to have a distinct name
 //       for your player during the tournament
-public class Clone  extends DraughtsPlayer{
+public class Aggressive  extends DraughtsPlayer{
     private int bestValue=0;
     int maxSearchDepth;
-    public int whitePcs = 20;
-    public int blackPcs = 20;
-    public int lastwhitePcs = 20;
-    public int lastblackPcs = 20;
+    public int whitePiece = 20;
+    public int whiteKing = 0;
+    public int blackPiece = 20;
+    public int blackKing = 0;
+    public int whiteCount = 20;
+    public int blackCount = 20;
+    public int lastwhiteCount = 20;
+    public int lastblackCount = 20;
     /** boolean that indicates that the GUI asked the player to stop thinking. */
     private boolean stopped;
 //    protected boolean playerColor;
 
-    public Clone(int maxSearchDepth) {
-        super("clone.jpg"); // ToDo: replace with your own icon
+    public Aggressive(int maxSearchDepth) {
+        super("Emperor's_Shadow_Guard.jpeg"); // ToDo: replace with your own icon
         this.maxSearchDepth = maxSearchDepth;
     }
     
@@ -41,15 +46,11 @@ public class Clone  extends DraughtsPlayer{
                 while (true){
                     bestValue = alphaBeta(node, MIN_VALUE, MAX_VALUE, maxSearchDepth, 0);
                     bestMove  = node.getBestMove();
-                    maxSearchDepth++;
+                    maxSearchDepth = maxSearchDepth + 2;    //Focusing on optimizing our own move
                 
                         // store the bestMove found uptill now
                         // NB this is not done in case of an AIStoppedException in alphaBeat()                
-                    // print the results for debugging reasons
-                    System.err.format(
-                        "%s: depth= %2d, best move = %5s, value=%d\n", 
-                        this.getClass().getSimpleName(),maxSearchDepth, bestMove, bestValue
-                    );
+                    // print the results for debugging reasons                    
                     }            
         } catch (AIStoppedException ex) {  /* nothing to do */  }
         
@@ -57,6 +58,10 @@ public class Clone  extends DraughtsPlayer{
             System.err.println("no valid move found!");
             return getRandomValidMove(s);
         } else {
+            System.err.format(
+                        "%s: depth= %2d, best move = %5s, value=%d\n", 
+                        this.getClass().getSimpleName(),maxSearchDepth, bestMove, bestValue
+                    );
             return bestMove;
         }
     } 
@@ -123,8 +128,9 @@ public class Clone  extends DraughtsPlayer{
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
         DraughtsState state = node.getState();
-        countPcs(state);
-        System.out.println("WhitePcs: " + whitePcs + " BlackPcs: " + blackPcs +" lastWhitePcs: " + lastwhitePcs + " lastBlackPcs: " + lastblackPcs);
+        
+//        System.out.println("WhitePcs: " + whitePcs + " BlackPcs: " + blackPcs +" lastWhitePcs: " + lastwhitePcs + " lastBlackPcs: " + lastblackPcs);
+//        System.out.println("Current Depth: " + curDepth + " Depth Limit: " + depth);
         if(curDepth >= depth && isQuite()){
             return evaluate(state);          
         }
@@ -135,8 +141,12 @@ public class Clone  extends DraughtsPlayer{
         if (moves.isEmpty()) {
             return evaluate(state);
         }
-        lastwhitePcs = whitePcs;
-        lastblackPcs = blackPcs;
+//        if (depth >= 10) {
+//            moves = sortMoves(node, moves);            
+//        }
+        countPcs(state);
+        lastwhiteCount = whiteCount;
+        lastblackCount = blackCount;
         for (Move move : moves){           
             state.doMove(move);
             int value = alphaBetaMax(node, alpha, beta, depth, curDepth + 1);
@@ -159,9 +169,9 @@ public class Clone  extends DraughtsPlayer{
     int alphaBetaMax(DraughtsNode node, int alpha, int beta, int depth, int curDepth)
             throws AIStoppedException {
         if (stopped) { stopped = false; throw new AIStoppedException(); }
-        DraughtsState state = node.getState();
-        countPcs(state);
-        System.out.println("WhitePcs: " + whitePcs + " BlackPcs: " + blackPcs +" lastWhitePcs: " + lastwhitePcs + " lastBlackPcs: " + lastblackPcs);
+        DraughtsState state = node.getState();        
+//        System.out.println("WhitePcs: " + whitePcs + " BlackPcs: " + blackPcs +" lastWhitePcs: " + lastwhitePcs + " lastBlackPcs: " + lastblackPcs);
+//        System.out.println("Current Depth: " + curDepth + " Depth Limit: " + depth);
         if(curDepth >= depth && isQuite()){
             return evaluate(state);
         }
@@ -172,8 +182,13 @@ public class Clone  extends DraughtsPlayer{
         if (moves.isEmpty()) {
             return evaluate(state);
         }
-        lastwhitePcs = whitePcs;
-        lastblackPcs = blackPcs;
+//        if (depth >= 10){
+//            moves = sortMoves(node, moves);
+//            Collections.reverse(moves); //Compensate for the fact that Heapsort sorts from small to large
+//        }
+        countPcs(state);
+        lastwhiteCount = whiteCount;
+        lastblackCount = blackCount;
         for (Move move : moves){
             state.doMove(move);            
             int value = alphaBetaMin(node, alpha, beta, depth, curDepth + 1);
@@ -195,63 +210,136 @@ public class Clone  extends DraughtsPlayer{
     
     void countPcs (DraughtsState state){
         int[] pieces = state.getPieces();
-        whitePcs = 0;
-        blackPcs = 0;
+        whiteCount = 0;
+        blackCount = 0;
+        whitePiece = 0;
+        whiteKing = 0;
+        blackPiece = 0;
+        blackKing = 0;
         for (int i = 1; i < 51; i++){
-            if (pieces[i] == DraughtsState.WHITEPIECE || pieces[i] == DraughtsState.WHITEKING){
-                whitePcs++;
-            } else if(pieces[i] == DraughtsState.BLACKPIECE || pieces[i] == DraughtsState.BLACKKING) {
-                blackPcs++;
+            if (pieces[i] == DraughtsState.WHITEPIECE) {                
+                whitePiece++;
+            }
+            else if (pieces[i] == DraughtsState.WHITEKING) {
+                whiteKing++;
+            }
+            else if(pieces[i] == DraughtsState.BLACKPIECE) {
+                blackPiece++;
+            }
+            else if(pieces[i] == DraughtsState.BLACKKING) {
+                blackKing++;
             }
         }
+        whiteCount = whitePiece + 3 * whiteKing;
+        blackCount = blackPiece + 3 * blackKing;
     }
     
     boolean isQuite () {        
-        if (whitePcs == lastwhitePcs || blackPcs == lastblackPcs){//Not the perfect condition for checking quiescence        
+        if (whiteCount == lastwhiteCount || blackCount == lastblackCount){//Not the perfect condition for checking quiescence        
             return true;
         }
         else {
+//            System.out.println("State is not quite");
             return false;
         }        
     }
+    
+//    List<Move> sortMoves(DraughtsNode node, List<Move> moves) {
+//        DraughtsState state = node.getState();
+//        int length = moves.size();
+//        int[] evaluations = new int[length];
+//        
+////        List<Move> newMoves = new ArrayList<>(moves);
+//        for (Move move : moves){
+//            state.doMove(move);
+//            countPcs(state);
+//            DraughtsState new_state = node.getState();
+//            evaluations[moves.indexOf(move)] = evaluate(new_state);
+//            state.undoMove(move);            
+//        }
+//        //Build heap
+//        for (int i = length / 2 - 1; i >= 0; i--) {
+//            heapifyMoves(evaluations, moves, length, i);
+//        }
+//        //Extract one by one the largest element from the heap
+//        for (int i = length - 1; i >= 0; i--){
+//            //Exchange the root node and the end node
+//            int temp = evaluations[0];
+//            evaluations[0] = evaluations[i];
+//            evaluations[i] = temp;
+//            Move tmp_move = moves.get(0);
+//            moves.set(0, moves.get(i));
+//            moves.set(i, tmp_move);
+//            //Maintain the heap properties for the remaining heap
+//            heapifyMoves(evaluations, moves, i, 0);
+//        }
+//        
+//        return moves;
+//    }
+//    
+//    void heapifyMoves(int[] evals, List<Move> Moves, int n, int i) {
+//        int largest = i;
+//        int left = i * 2 + 1;
+//        int right = i * 2 + 2;
+//        
+//        if (left < n && evals[left] > evals[largest]) {
+//            largest = left;
+//        }
+//        if (right < n && evals[right] > evals[largest]) {
+//            largest = right;
+//        }
+//        if(largest != i) {
+//            int tmp = evals[i];
+//            evals[i] = evals[largest];
+//            evals[largest] = tmp;
+//            Move tmp_move = Moves.get(i);
+//            Moves.set(i, Moves.get(largest));
+//            Moves.set(largest, tmp_move);
+//            
+//            heapifyMoves(evals, Moves, n, largest);
+//        }
+//    }
+    
     /** A method that evaluates the given state. */
     int evaluate(DraughtsState state) { 
-        int[] pieces = state.getPieces();
-        int material, whiteCount = 0, blackCount = 0;
-        int tempi, whiteTempi = 0, blackTempi = 0;
-        int centring, whiteCentr = 0, blackCentr = 0;
-        int formation, whiteForm = 0, blackForm = 0;
-        int balance, whiteBalance = 0, blackBalance = 0;
-        int matWeight = 6, tempWeight = 2, centrWeight = 1, formWeight = 1, balanceWeight = 1;
-        for (int i = 1; i < 51; i++){
-            if (pieces[i] == DraughtsState.WHITEPIECE){
-                whiteCount++;
-                whiteTempi += -(Math.ceil(i / 5) - 10);
-                whiteCentr += -(Math.abs(i % 5 - 3) - 2);
-                whiteBalance += Integer.signum(Math.abs(i % 5 - 3));
-            } else if(pieces[i] == DraughtsState.WHITEKING){          //WHITEPIECE = 1, WHITEKING = 3
-                whiteCount += 3;
-                whiteTempi += 10;
-                whiteCentr += -(Math.abs(i % 5 - 3) - 2);
-            } else if(pieces[i] == DraughtsState.BLACKPIECE) {
-                blackCount++;
-                blackTempi += Math.ceil(i / 5);
-                blackCentr += -(Math.abs(i % 5 - 3) - 2);
-                blackBalance += Integer.signum(Math.abs(i % 5 - 3));
-            } else if(pieces[i] == DraughtsState.BLACKKING) {      //BLACKPIECE = 2, BLACKKING = 4
-                blackCount += 3;
-                blackTempi += 10;
-                blackCentr += -(Math.abs(i % 5 - 3) - 2);
-            }
-            
-        }        
+//        int[] pieces = state.getPieces();
+        int material;
+//        int tempi, whiteTempi = 0, blackTempi = 0;
+//        int centring, whiteCentr = 0, blackCentr = 0;
+//        int formation, whiteForm = 0, blackForm = 0;
+//        int balance, whiteBalance = 0, blackBalance = 0;
+        int matWeight = 6;//, tempiWeight = 2, centrWeight = 1, formWeight = 1, balanceWeight = 1;
+//        for (int i = 1; i < 51; i++){
+//            if (pieces[i] == DraughtsState.WHITEPIECE){
+////                whiteCount++;
+//                whiteTempi += -(Math.ceil(i / 5) - 10);
+//                whiteCentr += -(Math.abs(i % 5 - 3) - 2);
+////                whiteBalance += Integer.signum(Math.abs(i % 5 - 3));
+//                whiteBalance += Integer.signum(i % 5 - 3);
+//            } else if(pieces[i] == DraughtsState.WHITEKING){         
+////                whiteCount += 3;
+//                whiteTempi += 10;
+//                whiteCentr += -(Math.abs(i % 5 - 3) - 2);
+//            } else if(pieces[i] == DraughtsState.BLACKPIECE) {
+////                blackCount++;
+//                blackTempi += Math.ceil(i / 5);
+//                blackCentr += -(Math.abs(i % 5 - 3) - 2);
+////                blackBalance += Integer.signum(Math.abs(i % 5 - 3));
+//                blackBalance += Integer.signum(i % 5 - 3);
+//            } else if(pieces[i] == DraughtsState.BLACKKING) {      
+////                blackCount += 3;
+//                blackTempi += 10;
+//                blackCentr += -(Math.abs(i % 5 - 3) - 2);
+//            }
+//            
+//        }        
         material = whiteCount - blackCount;
-        tempi = whiteTempi - blackTempi;
-        centring = whiteCentr - blackCentr;
-        formation = whiteForm - blackForm;
-        balance = whiteBalance - blackBalance;
+//        tempi = whiteTempi - blackTempi;
+//        centring = whiteCentr - blackCentr;
+//        formation = whiteForm - blackForm;
+//        balance = whiteBalance - blackBalance;
         
-        int evaluation = matWeight * material + tempWeight * tempi + centrWeight * centring + formWeight * formation + balanceWeight * balance;
+        int evaluation = matWeight * material;// + tempiWeight * tempi + centrWeight * centring + formWeight * formation + balanceWeight * balance;
         return evaluation; 
     }
 }
