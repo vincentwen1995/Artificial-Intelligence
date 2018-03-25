@@ -14,7 +14,7 @@ import nl.tue.s2id90.dl.NN.layer.OutputSoftmax;
 import nl.tue.s2id90.dl.NN.loss.CrossEntropy;
 import nl.tue.s2id90.dl.NN.optimizer.Optimizer;
 import nl.tue.s2id90.dl.NN.optimizer.SGD;
-import nl.tue.s2id90.dl.NN.optimizer.update.GradientDescent;
+import nl.tue.s2id90.dl.NN.optimizer.update.GD_Momentum;
 import nl.tue.s2id90.dl.NN.tensor.TensorShape;
 import nl.tue.s2id90.dl.NN.validate.Classification;
 import nl.tue.s2id90.dl.experiment.Experiment;
@@ -22,7 +22,6 @@ import nl.tue.s2id90.dl.input.InputReader;
 import nl.tue.s2id90.dl.input.MNISTReader;
 import nl.tue.s2id90.dl.javafx.FXGUI;
 import nl.tue.s2id90.dl.javafx.ShowCase;
-import experiments.MeanSubtraction;
 
 /**
  *
@@ -32,6 +31,7 @@ public class ZalandoExperiment extends Experiment {
     int batchSize = 8;
     int epochs = 5;
     float learningRate = 0.05f;
+//    float beta = 0.9f;
     int layers = 10;
     int layerSize = 10;
     
@@ -63,7 +63,8 @@ public class ZalandoExperiment extends Experiment {
                 .model(model)
                 .validator(new Classification())
                 .learningRate(learningRate)
-                .updateFunction(GradientDescent::new)
+//                .updateFunction(GradientDescent::new)
+                .updateFunction(GD_Momentum::new)
                 .build();
 //        System.out.println("Training data before pre-processing:");
 //        System.out.println(reader.getTrainingData().get(0).model_input.toString());
