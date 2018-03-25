@@ -5,6 +5,7 @@
  */
 package nl.tue.s2id90.dl.NN.optimizer.update;
 
+import java.util.Arrays;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -15,19 +16,25 @@ import org.nd4j.linalg.factory.Nd4j;
 public class GD_Momentum implements UpdateFunction{
     INDArray update;
     float beta;
+    UpdateFunction f;
 
-    public GD_Momentum() {
+    public GD_Momentum(){
         this.beta = 0.9f;
     }
-//    public GD_Momentum(float beta){
-//        this.beta = beta;
-//    }
+    
+    public GD_Momentum(float beta){
+        this.beta = beta;
+    }
     @Override
     public void update(INDArray value, boolean isBias, float learningRate, int batchSize, INDArray gradient) {
         if (update == null) update = gradient.dup('f').assign(0);
         
         float factor = -(learningRate/batchSize);
         
+//        System.out.println("Shape of Weight + Bias: ");
+//        System.out.println(Arrays.toString(value.shape()));
+//        System.out.println("Shape of Gradient: ");
+//        System.out.println(Arrays.toString(gradient.shape()));
         // Method1: Slides
         
         // First scale the momentum with the hyperparameter beta
