@@ -16,7 +16,6 @@ import org.nd4j.linalg.factory.Nd4j;
 public class GD_Momentum implements UpdateFunction{
     INDArray update;
     float beta;
-    UpdateFunction f;
 
     public GD_Momentum(){
         this.beta = 0.9f;
