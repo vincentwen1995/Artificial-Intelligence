@@ -31,29 +31,25 @@ public class GD_Momentum implements UpdateFunction{
         
         float factor = -(learningRate/batchSize);
         
-//        System.out.println("Shape of Weight + Bias: ");
-//        System.out.println(Arrays.toString(value.shape()));
-//        System.out.println("Shape of Gradient: ");
-//        System.out.println(Arrays.toString(gradient.shape()));
         // Method1: Slides
-        
+        /*
         // First scale the momentum with the hyperparameter beta
         Nd4j.getBlasWrapper().level1().scal( update.length(), beta, update);
         // Then update the momentum with the scaled gradient
         Nd4j.getBlasWrapper().level1().axpy( update.length(), (1 - beta), gradient, update );
         // Finally update the weight with the scaled momentum
         Nd4j.getBlasWrapper().level1().axpy( value.length(), factor, update, value );
-        
+        */
         
         //Method2: CS231N
-        /*
+        
         // First scale the momentum with the hyperparameter beta
         Nd4j.getBlasWrapper().level1().scal( update.length(), beta, update);
         // Then update the momentum with the scaled gradient
         Nd4j.getBlasWrapper().level1().axpy( update.length(), factor, gradient, update );
         // Finally update the weight with the momentum
         Nd4j.getBlasWrapper().level1().axpy( value.length(), 1.0f, update, value );
-        */
+        
         gradient.assign(0);
     }
 }

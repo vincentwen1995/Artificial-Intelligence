@@ -16,21 +16,29 @@ import org.nd4j.linalg.factory.Nd4j;
 public class L2Decay implements UpdateFunction{
     float decay; 
     UpdateFunction f;
+    INDArray update;
     public L2Decay(Supplier<UpdateFunction> supplier, float decay) {
         this.decay = decay;
-        this.f = supplier.get();
+        this.f = supplier.get();        
     }
     
     @Override
-    public void update(INDArray value, boolean isBias, float learningRate, int batchSize, INDArray gradient) {                
-        // First apply GD with Momentum
-        f.update(value, isBias, learningRate, batchSize, gradient);
+    public void update(INDArray value, boolean isBias, float learningRate, int batchSize, INDArray gradient) {
+        // Make a copy of gradient as it is reset after gradient descent momentum update
+//        INDArray value_copy = Nd4j.zeros(value.shape());
+//        Nd4j.getBlasWrapper().level1().copy(value, value_copy);
+        // First apply GD (with Momentum ?) NB: To cope with GD_Momentum, the update from GD_Momentum needs to subtract(add) decay * factor * value(original)
+//        f.update(value, isBias, learningRate, batchSize, gradient);     // value(updated) <- value(original) + factor * gradient
+        
         // Only apply L2Decay to weights matrix
         if (!isBias) {
-            float factor = -(learningRate/batchSize);
-            // Scale down the weights matrix by (1 - decay) * factor
-            Nd4j.getBlasWrapper().level1().scal( value.length(), (1 - decay) * factor, value);
-            gradient.assign(0);
+//            float factor = -(learningRate/batchSize);
+            
+            // Subtract the decay from the updated value ()
+//            Nd4j.getBlasWrapper().level1().axpy( value.length(), decay * factor, value_copy, value );   // value <- value(updated) + factor * decay * value(original)
+//            gradient.assign(0);
+            Nd4j.getBlasWrapper().level1().axpy( gradient.length(), decay, value, gradient );
         }
+        f.update(value, isBias, learningRate, batchSize, gradient);
     }
 }

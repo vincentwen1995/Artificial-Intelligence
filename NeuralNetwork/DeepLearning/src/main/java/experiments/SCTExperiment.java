@@ -72,6 +72,7 @@ public class SCTExperiment extends Experiment {
                 .learningRate(learningRate)
 //                .updateFunction(() -> new GD_Momentum(beta))
                 .updateFunction(() -> new L2Decay(() -> new GD_Momentum(beta), lambda))
+//                .updateFunction(() -> new L2Decay(GradientDescent::new, lambda))        //Best performance
                 .build();
         // Data Preprocessing
         MeanSubtraction data_pre = new MeanSubtraction();
