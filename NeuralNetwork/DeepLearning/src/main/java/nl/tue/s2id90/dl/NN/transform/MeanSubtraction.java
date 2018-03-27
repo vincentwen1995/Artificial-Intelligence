@@ -3,11 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package experiments;
+package nl.tue.s2id90.dl.NN.transform;
 
 import java.util.List;
 import nl.tue.s2id90.dl.NN.tensor.TensorPair;
-import nl.tue.s2id90.dl.NN.transform.DataTransform;
 
 /**
  *
@@ -15,7 +14,7 @@ import nl.tue.s2id90.dl.NN.transform.DataTransform;
  */
 public class MeanSubtraction implements DataTransform{
     Float mean;
-    MeanSubtraction() {}
+    public MeanSubtraction() {}
     @Override public void fit(List<TensorPair> data) {
         if (data.isEmpty()){
             throw new IllegalArgumentException("Empty dataset");           

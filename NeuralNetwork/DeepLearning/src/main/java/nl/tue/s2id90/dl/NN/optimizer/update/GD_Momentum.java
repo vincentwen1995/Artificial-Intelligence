@@ -41,13 +41,20 @@ public class GD_Momentum implements UpdateFunction{
         */
         
         //Method2: CS231N
-        
+        /*
         // First scale the momentum with the hyperparameter beta
         Nd4j.getBlasWrapper().level1().scal( update.length(), beta, update);
         // Then update the momentum with the scaled gradient
         Nd4j.getBlasWrapper().level1().axpy( update.length(), factor, gradient, update );
         // Finally update the weight with the momentum
         Nd4j.getBlasWrapper().level1().axpy( value.length(), 1.0f, update, value );
+        */
+        
+        //Method2: CS231N with higher-level ND4J methods
+        // Update the momentum: v = beta * v + factor * gradient
+        update.muli(beta).addi(gradient.muli(factor));
+        // Update the value: value = value + update
+        value.addi(update);
         
         gradient.assign(0);
     }

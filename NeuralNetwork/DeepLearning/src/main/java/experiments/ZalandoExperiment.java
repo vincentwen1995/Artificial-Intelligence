@@ -5,6 +5,7 @@
  */
 package experiments;
 
+import nl.tue.s2id90.dl.NN.transform.MeanSubtraction;
 import java.io.IOException;
 import nl.tue.s2id90.dl.NN.Model;
 import nl.tue.s2id90.dl.NN.initializer.Gaussian;
@@ -15,7 +16,6 @@ import nl.tue.s2id90.dl.NN.loss.CrossEntropy;
 import nl.tue.s2id90.dl.NN.optimizer.Optimizer;
 import nl.tue.s2id90.dl.NN.optimizer.SGD;
 import nl.tue.s2id90.dl.NN.optimizer.update.GD_Momentum;
-import nl.tue.s2id90.dl.NN.optimizer.update.GradientDescent;
 import nl.tue.s2id90.dl.NN.tensor.TensorShape;
 import nl.tue.s2id90.dl.NN.validate.Classification;
 import nl.tue.s2id90.dl.experiment.Experiment;
@@ -23,6 +23,8 @@ import nl.tue.s2id90.dl.input.InputReader;
 import nl.tue.s2id90.dl.input.MNISTReader;
 import nl.tue.s2id90.dl.javafx.FXGUI;
 import nl.tue.s2id90.dl.javafx.ShowCase;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 /**
  *
@@ -31,7 +33,7 @@ import nl.tue.s2id90.dl.javafx.ShowCase;
 public class ZalandoExperiment extends Experiment {
     int batchSize = 16;
     int epochs = 5;
-    float learningRate = 0.04f;
+    float learningRate = 0.01f;
     float beta = 0.9f;
 //    int layers = 10;
 //    int layerSize = 10;
@@ -64,15 +66,14 @@ public class ZalandoExperiment extends Experiment {
                 .model(model)
                 .validator(new Classification())
                 .learningRate(learningRate)
-//                .updateFunction(GradientDescent::new)
-//                .updateFunction(GD_Momentum::new)         //Implementing GD with momentum
                 .updateFunction(() -> new GD_Momentum(beta))
                 .build();
         // Data Preprocessing
         MeanSubtraction data_pre = new MeanSubtraction();
         data_pre.fit((reader.getTrainingData()));
         data_pre.transform(reader.getTrainingData());
-        data_pre.transform(reader.getValidationData());
+        data_pre.transform(reader.getValidationData());       
+        
         trainModel(model, reader, sgd, epochs, 0);
     }
     

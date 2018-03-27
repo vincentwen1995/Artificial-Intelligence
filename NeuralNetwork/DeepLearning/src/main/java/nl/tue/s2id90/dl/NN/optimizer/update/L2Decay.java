@@ -37,6 +37,7 @@ public class L2Decay implements UpdateFunction{
             // Subtract the decay from the updated value ()
 //            Nd4j.getBlasWrapper().level1().axpy( value.length(), decay * factor, value_copy, value );   // value <- value(updated) + factor * decay * value(original)
 //            gradient.assign(0);
+            // Update the gradient with the L2 penalty: gradient = gradient + lambda * value
             Nd4j.getBlasWrapper().level1().axpy( gradient.length(), decay, value, gradient );
         }
         f.update(value, isBias, learningRate, batchSize, gradient);

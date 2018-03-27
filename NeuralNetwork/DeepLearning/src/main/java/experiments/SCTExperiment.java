@@ -5,6 +5,7 @@
  */
 package experiments;
 
+import nl.tue.s2id90.dl.NN.transform.MeanSubtraction;
 import java.io.IOException;
 import nl.tue.s2id90.dl.NN.Model;
 import nl.tue.s2id90.dl.NN.activation.RELU;
@@ -35,12 +36,12 @@ import nl.tue.s2id90.dl.javafx.ShowCase;
 public class SCTExperiment extends Experiment {    
     int batchSize = 16;
     int epochs = 5;
-    float learningRate = 0.04f;
+    float learningRate = 0.01f;
     float beta = 0.9f;
     float epsilon = (float) 1e-6;
     float lambda = 0.0001f;
     int kernelSize = 3;
-    int kernels = 2;
+    int kernels = 8;
     int convStride = 1;
     int poolStride = 2;
     
@@ -52,7 +53,7 @@ public class SCTExperiment extends Experiment {
     
     
     public void go() throws IOException {
-    // read input and print some information on the data
+        // read input and print some information on the data
         int seed = 11081961, trainingDataSize = 1200, testDataSize = 200;
         InputReader reader = new PrimitivesDataGenerator(batchSize, seed, trainingDataSize, testDataSize);
         System.out.println("Reader info:\n" + reader.toString());
@@ -75,14 +76,14 @@ public class SCTExperiment extends Experiment {
 //                .updateFunction(() -> new GD_Momentum(beta))
 //                .updateFunction(() -> new L2Decay(() -> new GD_Momentum(beta), lambda))
 //                .updateFunction(() -> new L2Decay(GradientDescent::new, lambda))        //Best performance
-                .updateFunction(() -> new Adadelta(beta, epsilon))
+//                .updateFunction(() -> new Adadelta(beta, epsilon))
                 .build();
         // Data Preprocessing
         MeanSubtraction data_pre = new MeanSubtraction();
         data_pre.fit((reader.getTrainingData()));
         data_pre.transform(reader.getTrainingData());
         data_pre.transform(reader.getValidationData());
-        trainModel(model, reader, sgd, epochs, 0);
+        trainModel(model, reader, sgd, epochs, 250);
     }
     
     Model createModel(int input_width, int input_height, int input_depth, int outputs) {
