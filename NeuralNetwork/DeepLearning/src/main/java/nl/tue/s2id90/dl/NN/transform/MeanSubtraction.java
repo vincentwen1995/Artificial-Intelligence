@@ -19,6 +19,7 @@ public class MeanSubtraction implements DataTransform{
         if (data.isEmpty()){
             throw new IllegalArgumentException("Empty dataset");           
         }                
+        System.out.println("Initializing mean subtractions...");
         float sumMean = 0;
         for (TensorPair pair: data){
             sumMean += pair.model_input.getValues().meanNumber().floatValue();            
@@ -29,6 +30,7 @@ public class MeanSubtraction implements DataTransform{
         for (TensorPair pair: data){
             pair.model_input.getValues().subi(mean);
         }
+        System.out.println("Mean subtractions for Training Data in gray channel done...");
     }
     
 }
