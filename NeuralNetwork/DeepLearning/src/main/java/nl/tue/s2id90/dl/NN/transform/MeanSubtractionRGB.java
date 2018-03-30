@@ -21,18 +21,22 @@ public class MeanSubtractionRGB implements DataTransform{
             throw new IllegalArgumentException("Empty dataset");           
         }                
         System.out.println("Initializing mean subtractions...");
-        float sumMean_R = 0, sumMean_G = 0, sumMean_B = 0;
+        // Initialize the sums of means of the inputs per data pairs for the three channels
+        float sumMean_R = 0, sumMean_G = 0, sumMean_B = 0;        
         for (TensorPair pair: data){
+            // Accumulate the sums of means for the three channels
             sumMean_R += pair.model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.all()).meanNumber().floatValue();
             sumMean_G += pair.model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(1), NDArrayIndex.all(), NDArrayIndex.all()).meanNumber().floatValue();
             sumMean_B += pair.model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(2), NDArrayIndex.all(), NDArrayIndex.all()).meanNumber().floatValue();
         }
+        // Compute the means over all of the inputs per data pairs in the training set for the three channels
         mean_R = sumMean_R / data.size();
         mean_G = sumMean_G / data.size();
         mean_B = sumMean_B / data.size();
     }
     @Override public void transform(List<TensorPair> data){
         for (TensorPair pair: data){
+            // Subtract the means from each data pair's input for the three channels
             pair.model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.all()).subi(mean_R);
             pair.model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(1), NDArrayIndex.all(), NDArrayIndex.all()).subi(mean_G);
             pair.model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(2), NDArrayIndex.all(), NDArrayIndex.all()).subi(mean_B);

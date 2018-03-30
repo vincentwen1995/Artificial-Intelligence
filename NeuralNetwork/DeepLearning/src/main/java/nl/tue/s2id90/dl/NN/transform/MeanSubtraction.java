@@ -20,14 +20,18 @@ public class MeanSubtraction implements DataTransform{
             throw new IllegalArgumentException("Empty dataset");           
         }                
         System.out.println("Initializing mean subtractions...");
+        // Initialize the sum of means of the inputs per data pairs
         float sumMean = 0;
         for (TensorPair pair: data){
+            // Accumulate the sum of means
             sumMean += pair.model_input.getValues().meanNumber().floatValue();            
         }
+        // Compute the mean over all of the inputs per data pairs in the training set
         mean = sumMean / data.size();
     }
     @Override public void transform(List<TensorPair> data){
         for (TensorPair pair: data){
+            // Subtract the mean from each data pair's input
             pair.model_input.getValues().subi(mean);
         }
         System.out.println("Mean subtractions in gray channel done...");

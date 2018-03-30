@@ -56,9 +56,10 @@ public class FunctionExperiment extends Experiment {
     
     Model createModel(int inputs, int outputs) {
 
-        Model model = new Model(new InputLayer("In", new TensorShape(inputs), true));
+        Model model = new Model(new InputLayer("In", new TensorShape(inputs), true));        
         model.addLayer(new FullyConnected("fc1", new TensorShape(inputs), layerSize, new RELU()));
         for (int i = 1; i < layers; i++) {
+            // Add multiple fully-connected layers to the network as defined by the parameters layers and layerSize
             model.addLayer(new FullyConnected("fc"+Integer.toString(i + 1), new TensorShape(layerSize), layerSize, new RELU()));
         }
         model.addLayer(new SimpleOutput("Out", new TensorShape(layerSize), outputs, new MSE(), true));

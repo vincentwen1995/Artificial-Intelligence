@@ -60,7 +60,7 @@ public class CIFAR10Experiment extends Experiment{
         ShowCase showCase = new ShowCase(i -> labels[i]);
         FXGUI.getSingleton().addTab("show case", showCase.getNode());
         showCase.setItems(reader.getValidationData(100));
-        
+        // Initialize input and output sizes
         int input_width = 32;
         int input_height = 32;
         int input_depth = 3;
@@ -74,40 +74,14 @@ public class CIFAR10Experiment extends Experiment{
                 .learningRate(learningRate)
 //                .updateFunction(() -> new GD_Momentum(beta))
 //                .updateFunction(() -> new L2Decay(() -> new GD_Momentum(beta), lambda))
-//                .updateFunction(() -> new L2Decay(GradientDescent::new, lambda))
                 .updateFunction(() -> new Adadelta(beta, epsilon))
                 .build();
-        
-//        System.out.println("First image in Training Data before mean subtraction and RGB normalization: ");
-//        System.out.println(reader.getTrainingData().get(0).model_input.getValues());
-        
+                
         // Data Preprocessing
         MeanSubtractionRGB data_pre = new MeanSubtractionRGB();
         data_pre.fit((reader.getTrainingData()));
         data_pre.transform(reader.getTrainingData());
         data_pre.transform(reader.getValidationData());
-
-//        System.out.println("First image in Training Data after mean subtraction and before RGB normalization: ");
-//        System.out.println(reader.getTrainingData().get(0).model_input.getValues());
-        
-//        RGBnormalization rgb_norm = new RGBnormalization();
-//        rgb_norm.fit(reader.getTrainingData());
-//        rgb_norm.transform(reader.getTrainingData());
-//        rgb_norm.fit(reader.getValidationData());
-//        rgb_norm.transform(reader.getValidationData());
-
-        // For debugging:
-//        System.out.println("First image in Training Data after mean subtraction and RGB normalization: ");
-//        System.out.println(reader.getTrainingData().get(0).model_input.getValues());
-//        System.out.println("Data before preprocessing:");
-//        System.out.println("Shape of one picture:");
-//        System.out.println(Arrays.toString(reader.getTrainingData().get(0).model_input.getValues().shape()));
-//        System.out.println("Sum along RGB:");
-//        System.out.println(reader.getTrainingData().get(0).model_input.getValues().sum(1).shapeInfoToString());
-//        System.out.println("Get first picture's R matrix:");
-//        System.out.println(reader.getTrainingData().get(0).model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.all()));
-//        System.out.println("Shape of this:");
-//        System.out.println(reader.getTrainingData().get(0).model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.all()).shapeInfoToString());
 
         trainModel(model, reader, sgd, epochs, batchSize/4 );
     }    
@@ -124,13 +98,9 @@ public class CIFAR10Experiment extends Experiment{
         model.addLayer(new Convolution2D("Conv3.1", new TensorShape(input_width / (poolStride * poolStride), input_height / (poolStride * poolStride), kernels2), kernelSize, kernels3, new RELU()));
         model.addLayer(new Convolution2D("Conv3.2", new TensorShape(input_width / (poolStride * poolStride), input_height / (poolStride * poolStride), kernels3), kernelSize, kernels3, new RELU()));
         model.addLayer(new PoolMax2D("Pool3", new TensorShape(input_width / (poolStride * poolStride), input_height / (poolStride * poolStride), kernels3), poolStride));        
-//        model.addLayer(new Convolution2D("Conv4", new TensorShape(input_width / (poolStride * poolStride * poolStride), input_height / (poolStride * poolStride * poolStride), kernels2), 1, kernels2, new RELU()));
         model.addLayer(new Flatten("Flatten", new TensorShape(input_width / (poolStride * poolStride * poolStride), input_height / (poolStride * poolStride * poolStride), kernels3)));        
         model.addLayer(new FullyConnected("fc1", new TensorShape(input_width / (poolStride * poolStride * poolStride) * input_height / (poolStride * poolStride * poolStride) * kernels3), 
                 kernels3, new RELU()));
-//        model.addLayer(new FullyConnected("fc2", new TensorShape(input_width / (poolStride * poolStride * poolStride) * input_height / (poolStride * poolStride * poolStride) * kernels2 / 4), 
-//                input_width / (poolStride * poolStride * poolStride) * input_height / (poolStride * poolStride * poolStride) * kernels2 / 16, new RELU()));
-//        model.addLayer(new OutputSoftmax("Out", new TensorShape((input_width / (poolStride * poolStride)) * (input_height / (poolStride * poolStride)) * kernels), labels.length, new CrossEntropy()));
         model.addLayer(new OutputSoftmax("Out", new TensorShape(kernels3), labels.length, new CrossEntropy()));
         model.initialize(new Gaussian());
         System.out.println(model);
@@ -138,7 +108,6 @@ public class CIFAR10Experiment extends Experiment{
     }
     
     public static void main(String[] args) throws IOException {
-//        CudaEnvironment.getInstance().getConfiguration().allowMultiGPU(true);
         new CIFAR10Experiment().go();
     }
     

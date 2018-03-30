@@ -61,7 +61,7 @@ public class SCTExperiment extends Experiment {
         ShowCase showCase = new ShowCase(i -> labels[i]);
         FXGUI.getSingleton().addTab("show case", showCase.getNode());
         showCase.setItems(reader.getValidationData(100));
-        
+        // Initialize input and output sizes
         int input_width = 28;
         int input_height = 28;
         int input_depth = 1;
@@ -75,7 +75,6 @@ public class SCTExperiment extends Experiment {
                 .learningRate(learningRate)
 //                .updateFunction(() -> new GD_Momentum(beta))
 //                .updateFunction(() -> new L2Decay(() -> new GD_Momentum(beta), lambda))
-//                .updateFunction(() -> new L2Decay(GradientDescent::new, lambda))        //Best performance
                 .updateFunction(() -> new Adadelta(beta, epsilon))
                 .build();
         // Data Preprocessing

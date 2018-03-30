@@ -34,10 +34,8 @@ public class ZalandoExperiment extends Experiment {
     int batchSize = 16;
     int epochs = 5;
     float learningRate = 0.01f;
-    float beta = 0.9f;
-//    float epsilon = (float) 1e-6;
-//    int layers = 10;
-//    int layerSize = 10;
+    float beta = 0.9f;  // Momentum factor
+
     
     String[] labels = {
             "T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
@@ -55,7 +53,7 @@ public class ZalandoExperiment extends Experiment {
         ShowCase showCase = new ShowCase(i -> labels[i]);
         FXGUI.getSingleton().addTab("show case", showCase.getNode());
         showCase.setItems(reader.getValidationData(100));
-        
+        // Initialize input and output sizes
         int input_width = 28;
         int input_height = 28;
         int input_depth = 1;
@@ -68,7 +66,6 @@ public class ZalandoExperiment extends Experiment {
                 .validator(new Classification())
                 .learningRate(learningRate)
 //                .updateFunction(() -> new GD_Momentum(beta))
-//                .updateFunction(() -> new Adadelta(beta, epsilon))
                 .build();
         // Data Preprocessing
         MeanSubtraction data_pre = new MeanSubtraction();
@@ -84,11 +81,6 @@ public class ZalandoExperiment extends Experiment {
         Model model = new Model(new InputLayer("In", new TensorShape(input_width, input_height, input_depth), true));
         model.addLayer(new Flatten("Flatten", new TensorShape(input_width, input_height, input_depth)));
         model.addLayer(new OutputSoftmax("Out", new TensorShape(input_width * input_height), labels.length, new CrossEntropy()));
-//        model.addLayer(new FullyConnected("fc1", new TensorShape(inputs), layerSize, new RELU()));
-//        for (int i = 1; i < layers; i++) {
-//            model.addLayer(new FullyConnected("fc"+Integer.toString(i + 1), new TensorShape(layerSize), layerSize, new RELU()));
-//        }
-//        model.addLayer(new SimpleOutput("Out", new TensorShape(layerSize), outputs, new MSE(), true));
         model.initialize(new Gaussian());
         System.out.println(model);
         return model;
