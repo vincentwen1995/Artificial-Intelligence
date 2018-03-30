@@ -37,7 +37,7 @@ public class MeanSubtractionRGB implements DataTransform{
             pair.model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(1), NDArrayIndex.all(), NDArrayIndex.all()).subi(mean_G);
             pair.model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(2), NDArrayIndex.all(), NDArrayIndex.all()).subi(mean_B);
         }
-        System.out.println("Mean subtractions for Training Data in RGB channels done...");
+        System.out.println("Mean subtractions in RGB channels done...");
     }
     
 }

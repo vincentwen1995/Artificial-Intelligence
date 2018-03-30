@@ -30,7 +30,7 @@ public class MeanSubtraction implements DataTransform{
         for (TensorPair pair: data){
             pair.model_input.getValues().subi(mean);
         }
-        System.out.println("Mean subtractions for Training Data in gray channel done...");
+        System.out.println("Mean subtractions in gray channel done...");
     }
     
 }
