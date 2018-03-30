@@ -6,7 +6,6 @@
 package experiments;
 
 import java.io.IOException;
-import java.util.Arrays;
 import nl.tue.s2id90.dl.NN.Model;
 import nl.tue.s2id90.dl.NN.activation.RELU;
 import nl.tue.s2id90.dl.NN.initializer.Gaussian;
@@ -22,7 +21,6 @@ import nl.tue.s2id90.dl.NN.optimizer.SGD;
 import nl.tue.s2id90.dl.NN.optimizer.update.Adadelta;
 import nl.tue.s2id90.dl.NN.tensor.TensorShape;
 import nl.tue.s2id90.dl.NN.transform.MeanSubtractionRGB;
-import nl.tue.s2id90.dl.NN.transform.RGBnormalization;
 import nl.tue.s2id90.dl.NN.validate.Classification;
 import nl.tue.s2id90.dl.experiment.Experiment;
 import nl.tue.s2id90.dl.input.Cifar10Reader;
@@ -35,21 +33,21 @@ import nl.tue.s2id90.dl.javafx.ShowCase;
  * @author Administrator
  */
 public class CIFAR10Experiment extends Experiment{
-    int batchSize = 32;
+    int batchSize = 128;
     int epochs = 5;
-    float learningRate = 0.01f;
+    float learningRate = 0.001f;
     float beta = 0.9f;
     float epsilon = (float) 1e-6;
     float lambda = 0.0001f;
     int kernelSize = 5;
-    int kernels = 64;
+    int kernels1 = 16;
+    int kernels2 = 20;
     int convStride = 1;
     int poolStride = 2;
     
     String[] labels = {
-            "Airplane", "Automobile", "Bird", "Cat", 
-            "Deer", "Dog", "Frog", "Horse", 
-            "Ship", "Truck"
+            "Airplane", "Automobile", "Bird", "Cat", "Deer",
+            "Dog", "Frog", "Horse", "Ship", "Truck"
         };
     CIFAR10Experiment() { super(true); }
 
@@ -110,23 +108,26 @@ public class CIFAR10Experiment extends Experiment{
 //        System.out.println("Shape of this:");
 //        System.out.println(reader.getTrainingData().get(0).model_input.getValues().get(NDArrayIndex.point(0), NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.all()).shapeInfoToString());
 
-        trainModel(model, reader, sgd, epochs, 250);
+        trainModel(model, reader, sgd, epochs, batchSize/4 );
     }    
     
     Model createModel(int input_width, int input_height, int input_depth, int outputs) {
 
         Model model = new Model(new InputLayer("In", new TensorShape(input_width, input_height, input_depth), true));        
-        model.addLayer(new Convolution2D("Conv1", new TensorShape(input_width, input_height, input_depth), kernelSize, kernels, new RELU()));
-        model.addLayer(new PoolMax2D("Pool1", new TensorShape(input_width, input_height, kernels), poolStride));
-        model.addLayer(new Convolution2D("Conv2", new TensorShape(input_width / poolStride, input_height / poolStride, kernels), kernelSize, kernels, new RELU()));
-        model.addLayer(new PoolMax2D("Pool2", new TensorShape(input_width / poolStride, input_height / poolStride, kernels), poolStride));
-        model.addLayer(new Flatten("Flatten", new TensorShape(input_width / (poolStride * poolStride), input_height / (poolStride * poolStride), kernels)));        
-        model.addLayer(new FullyConnected("fc1", new TensorShape(input_width / (poolStride * poolStride) * input_height / (poolStride * poolStride) * kernels), 
-                input_width / (poolStride * poolStride) * input_height / (poolStride * poolStride) * kernels / 4, new RELU()));
-        model.addLayer(new FullyConnected("fc2", new TensorShape(input_width / (poolStride * poolStride) * input_height / (poolStride * poolStride) * kernels / 4), 
-                input_width / (poolStride * poolStride) * input_height / (poolStride * poolStride) * kernels / 16, new RELU()));
+        model.addLayer(new Convolution2D("Conv1", new TensorShape(input_width, input_height, input_depth), kernelSize, kernels1, new RELU()));
+        model.addLayer(new PoolMax2D("Pool1", new TensorShape(input_width, input_height, kernels1), poolStride));
+        model.addLayer(new Convolution2D("Conv2", new TensorShape(input_width / poolStride, input_height / poolStride, kernels1), kernelSize, kernels2, new RELU()));
+        model.addLayer(new PoolMax2D("Pool2", new TensorShape(input_width / poolStride, input_height / poolStride, kernels2), poolStride));
+        model.addLayer(new Convolution2D("Conv3", new TensorShape(input_width / (poolStride * poolStride), input_height / (poolStride * poolStride), kernels2), kernelSize, kernels2, new RELU()));
+        model.addLayer(new PoolMax2D("Pool3", new TensorShape(input_width / (poolStride * poolStride), input_height / (poolStride * poolStride), kernels2), poolStride));
+        model.addLayer(new Convolution2D("Conv4", new TensorShape(input_width / (poolStride * poolStride * poolStride), input_height / (poolStride * poolStride * poolStride), kernels2), 1, kernels2, new RELU()));
+        model.addLayer(new Flatten("Flatten", new TensorShape(input_width / (poolStride * poolStride * poolStride), input_height / (poolStride * poolStride * poolStride), kernels2)));        
+        model.addLayer(new FullyConnected("fc1", new TensorShape(input_width / (poolStride * poolStride * poolStride) * input_height / (poolStride * poolStride * poolStride) * kernels2), 
+                input_width / (poolStride * poolStride * poolStride) * input_height / (poolStride * poolStride * poolStride) * kernels2 / 4, new RELU()));
+//        model.addLayer(new FullyConnected("fc2", new TensorShape(input_width / (poolStride * poolStride * poolStride) * input_height / (poolStride * poolStride * poolStride) * kernels2 / 4), 
+//                input_width / (poolStride * poolStride * poolStride) * input_height / (poolStride * poolStride * poolStride) * kernels2 / 16, new RELU()));
 //        model.addLayer(new OutputSoftmax("Out", new TensorShape((input_width / (poolStride * poolStride)) * (input_height / (poolStride * poolStride)) * kernels), labels.length, new CrossEntropy()));
-        model.addLayer(new OutputSoftmax("Out", new TensorShape(input_width / (poolStride * poolStride) * input_height / (poolStride * poolStride) * kernels / 16), labels.length, new CrossEntropy()));
+        model.addLayer(new OutputSoftmax("Out", new TensorShape(input_width / (poolStride * poolStride * poolStride) * input_height / (poolStride * poolStride * poolStride) * kernels2 / 4), labels.length, new CrossEntropy()));
         model.initialize(new Gaussian());
         System.out.println(model);
         return model;
