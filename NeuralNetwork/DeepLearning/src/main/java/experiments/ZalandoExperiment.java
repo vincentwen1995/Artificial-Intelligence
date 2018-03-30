@@ -59,7 +59,7 @@ public class ZalandoExperiment extends Experiment {
         int input_width = 28;
         int input_height = 28;
         int input_depth = 1;
-        int outputs = 10;
+        int outputs = labels.length;
         
         Model model = createModel(input_width, input_height, input_depth, outputs);
         
@@ -67,21 +67,14 @@ public class ZalandoExperiment extends Experiment {
                 .model(model)
                 .validator(new Classification())
                 .learningRate(learningRate)
-                .updateFunction(() -> new GD_Momentum(beta))
+//                .updateFunction(() -> new GD_Momentum(beta))
 //                .updateFunction(() -> new Adadelta(beta, epsilon))
                 .build();
         // Data Preprocessing
         MeanSubtraction data_pre = new MeanSubtraction();
         data_pre.fit((reader.getTrainingData()));
         data_pre.transform(reader.getTrainingData());
-//        data_pre.transform(reader.getValidationData());       
         
-        // For debugging
-//        INDArray test = Nd4j.ones(3,3);
-//        INDArray test_1 = Nd4j.ones(3,3).muli(0.5f);
-//        test.divi(test_1);
-//        System.out.println(test_1);
-//        System.out.println(test);
         trainModel(model, reader, sgd, epochs, 0);
     }
     
