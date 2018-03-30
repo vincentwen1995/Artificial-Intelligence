@@ -85,7 +85,7 @@ public class CIFAR10Experiment extends Experiment{
         MeanSubtractionRGB data_pre = new MeanSubtractionRGB();
         data_pre.fit((reader.getTrainingData()));
         data_pre.transform(reader.getTrainingData());
-//        data_pre.transform(reader.getValidationData());
+        data_pre.transform(reader.getValidationData());
 
 //        System.out.println("First image in Training Data after mean subtraction and before RGB normalization: ");
 //        System.out.println(reader.getTrainingData().get(0).model_input.getValues());

@@ -82,7 +82,7 @@ public class SCTExperiment extends Experiment {
         MeanSubtraction data_pre = new MeanSubtraction();
         data_pre.fit((reader.getTrainingData()));
         data_pre.transform(reader.getTrainingData());
-//        data_pre.transform(reader.getValidationData());
+        data_pre.transform(reader.getValidationData());
         trainModel(model, reader, sgd, epochs, 250);
     }
     
